@@ -1,4 +1,4 @@
-namespace SmolyShortener
+namespace SmolyShortener.Database
 {
     public readonly struct DbColumn
     {

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SmolyShortener
+namespace SmolyShortener.Database
 {
     public static class DatabaseInit
     {

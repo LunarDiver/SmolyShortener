@@ -6,7 +6,7 @@ using System.Data.SQLite;
 using System.Threading.Tasks;
 using System.Linq;
 
-namespace SmolyShortener
+namespace SmolyShortener.Database
 {
     public class DatabaseClient : IDisposable
     {
