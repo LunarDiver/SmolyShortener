@@ -26,7 +26,7 @@ namespace SmolyShortener
             _connection.Open();
         }
 
-        public async Task CreateTable(string table, params string[] columns)
+        public async Task CreateTableAsync(string table, params DbColumn[] columns)
         {
             var command = new SQLiteCommand(
                 $"create table {table}({string.Join(',', columns)})",
@@ -35,7 +35,14 @@ namespace SmolyShortener
             await command.ExecuteNonQueryAsync();
         }
 
-        public async Task<int> Write(string table, params (string column, string value)[] insertInfo)
+        public async Task<bool> TableExistsAsync(string table)
+        {
+            var command = new SQLiteCommand($"SELECT name FROM sqlite_master WHERE type='table' AND name='{table}'", _connection);
+
+            return await command.ExecuteScalarAsync() != null;
+        }
+
+        public async Task<int> WriteAsync(string table, params (string column, string value)[] insertInfo)
         {
             for (int i = 0; i < insertInfo.Length; i++)
                 insertInfo[i].value = string.Join(string.Empty, insertInfo[i].value.Prepend('\'').Append('\''));
@@ -51,7 +58,7 @@ namespace SmolyShortener
             return await command.ExecuteNonQueryAsync();
         }
 
-        public async IAsyncEnumerable<object[]> Read(
+        public async IAsyncEnumerable<object[]> ReadAsync(
             string table,
             IEnumerable<string> columns,
             int maxRows,
@@ -79,25 +86,22 @@ namespace SmolyShortener
         }
 
         /// <summary>
-        /// Tests the connection by running a basic SQL version command through the database and returns the result.
+        /// Tests the connection by running a basic SQL version command through the database.
         /// </summary>
         /// <returns>
-        /// Returns either the database version or the exception output if one occurred.
+        /// Returns whether the command was successful.
         /// </returns>
-        public async Task<string> TestConnection()
+        public async Task<bool> TestConnectionAsync()
         {
             var command = new SQLiteCommand("select SQLITE_VERSION()", _connection);
-            string res;
             try
             {
-                res = (await command.ExecuteScalarAsync()).ToString();
+                return await command.ExecuteScalarAsync() != null;
             }
-            catch (System.Data.Common.DbException exc)
+            catch (System.Data.Common.DbException)
             {
-                return exc.Message;
+                return false;
             }
-
-            return res;
         }
 
         public void Dispose()
