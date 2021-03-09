@@ -20,13 +20,49 @@ namespace SmolyShortener.Controllers
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("s/{id}")]
         public async Task<IActionResult> GetHttp(string id)
         {
             if (!await EntryExists(id))
                 return Redirect("/");
 
             return Ok($"Test ok: {id}");
+        }
+
+        [HttpPost("shorten")]
+        public async Task<IActionResult> PostHttp()
+        {
+            string id = await CreateUniqueId();
+
+            // using var reader = new StreamReader(Request.Body);
+            // return Ok(await reader.ReadToEndAsync());
+            return Ok($"s/{await CreateUniqueId()}");
+        }
+
+        private async Task<string> CreateUniqueId()
+        {
+            int maxPossibilites = (int)Math.Round(Math.Pow(byte.MaxValue, 2));
+
+            var rng = new Random();
+            byte[] random = new byte[2];
+            string id = string.Empty;
+
+            int count;
+            for (count = 0; count < maxPossibilites; count++)
+            {
+                rng.NextBytes(random);
+                id = Convert.ToBase64String(random, Base64FormattingOptions.None)
+                    .TrimEnd('=')
+                    .Replace('+', '-')
+                    .Replace('/', '_');
+
+                if (!await EntryExists(id))
+                    break;
+            }
+            if (count >= maxPossibilites)
+                throw new ArithmeticException("Could not find id that is not yet in use.");
+
+            return id;
         }
 
         private async Task<bool> EntryExists(string id)
