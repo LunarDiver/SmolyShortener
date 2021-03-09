@@ -11,5 +11,5 @@ async function Shorten() {
     let resel = document.getElementById("postresult");
     resel.innerHTML = shortened;
     resel.href = shortened;
-    $('#postresult').collapse("show");
+    $('#postcollapse').collapse("show");
 }
