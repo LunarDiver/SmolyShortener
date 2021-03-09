@@ -22,7 +22,8 @@
             },
             "launchBrowser": {
                 "enabled": true
-            }
+            },
+            "console": "integratedTerminal"
         }
     ]
 }
