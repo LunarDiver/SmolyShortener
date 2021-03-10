@@ -24,10 +24,12 @@ namespace SmolyShortener.Controllers
         [HttpGet("s/{id}")]
         public async Task<IActionResult> GetHttp(string id)
         {
-            if (!await EntryExists(id))
+            string redirect = await GetRedirect(id);
+
+            if (!await EntryExists(id) || string.IsNullOrWhiteSpace(redirect))
                 return Redirect("/");
 
-            return Ok($"Test ok: {id}");
+            return Redirect(await GetRedirect(id));
         }
 
         [HttpPost("shorten")]
@@ -102,6 +104,22 @@ namespace SmolyShortener.Controllers
                 });
 
             return (await res.FirstOrDefaultAsync()) != null;
+        }
+
+        private async Task<string> GetRedirect(string id)
+        {
+            return (await Program.DbClient
+                .ReadAsync(
+                    _dbTable,
+                    new[] { "redirect" },
+                    1,
+                    new[]
+                    {
+                        $"id = '{id}'",
+                        $"datetime(expiry) > datetime('now')"
+                    })
+                .FirstOrDefaultAsync())?[0]?
+                .ToString();
         }
     }
 }
