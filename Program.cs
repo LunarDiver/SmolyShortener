@@ -31,7 +31,9 @@ namespace SmolyShortener
                 Console.WriteLine(exc.Message);
                 return 1;
             }
+
             CreateHostBuilder(args).Build().Run();
+
             return 0;
         }
 
@@ -45,7 +47,7 @@ namespace SmolyShortener
 
         private static void MainDispose(object sender, EventArgs e)
         {
-            DbClient.Dispose();
+            DbClient?.Dispose();
         }
     }
 }
