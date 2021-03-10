@@ -5,7 +5,8 @@ async function Shorten() {
     try {
         shortened = await $.post("/shorten", text);
     } catch (err) {
-        shortened = err;
+        alert(err.responseText);
+        return;
     }
 
     let resel = document.getElementById("postresult");
