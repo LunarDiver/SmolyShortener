@@ -12,7 +12,7 @@ namespace SmolyShortener.Database
                 new[]
                 {
                     new DbColumn("id", DbDatatype.TEXT, true, false),
-                    new DbColumn("redirect", DbDatatype.TEXT, "", false, false), //TODO: Create missing redirect page
+                    new DbColumn("redirect", DbDatatype.TEXT, "/", false, false),
                     new DbColumn("expiry", DbDatatype.TEXT, false, true)
                 }
             }
