@@ -1,3 +1,4 @@
+using System.IO;
 using System.Linq;
 using System;
 using Microsoft.AspNetCore.Mvc;
@@ -34,9 +35,17 @@ namespace SmolyShortener.Controllers
         {
             string id = await CreateUniqueId();
 
-            // using var reader = new StreamReader(Request.Body);
-            // return Ok(await reader.ReadToEndAsync());
-            return Ok($"s/{await CreateUniqueId()}");
+            using var reader = new StreamReader(Request.Body);
+            string url = await reader.ReadToEndAsync();
+
+            bool isValidUrl = Uri.TryCreate(url, UriKind.Absolute, out Uri uriUrl)
+                && !uriUrl.IsLoopback
+                && (uriUrl.Scheme == Uri.UriSchemeHttp || uriUrl.Scheme == Uri.UriSchemeHttps);
+
+            if (!isValidUrl)
+                return BadRequest($"Invalid URL: {url}");
+
+            return Ok($"{Request.Scheme}://{Request.Host}/s/{id}");
         }
 
         private async Task<string> CreateUniqueId()
