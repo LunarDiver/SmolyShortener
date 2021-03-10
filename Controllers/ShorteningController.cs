@@ -45,6 +45,8 @@ namespace SmolyShortener.Controllers
             if (!isValidUrl)
                 return BadRequest($"Invalid URL: {url}");
 
+            await WriteEntry(id, url);
+
             return Ok($"{Request.Scheme}://{Request.Host}/s/{id}");
         }
 
@@ -72,6 +74,15 @@ namespace SmolyShortener.Controllers
                 throw new ArithmeticException("Could not find id that is not yet in use.");
 
             return id;
+        }
+
+        private async Task WriteEntry(string id, string url)
+        {
+            await Program.DbClient.WriteAsync(
+                _dbTable,
+                ("id", id),
+                ("redirect", url),
+                ("expiry", (DateTime.UtcNow + TimeSpan.FromMinutes(5)).ToString("u")));
         }
 
         private async Task<bool> EntryExists(string id)
