@@ -3,7 +3,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="System.Data.SQLite" Version="1.0.113.7"/>
     <PackageReference Include="System.Linq.Async" Version="5.0.0"/>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.0-preview.2.21154.2"/>
   </ItemGroup>
 </Project>

@@ -23,7 +23,7 @@ namespace SmolyShortener.Database
             var client = new DatabaseClient(dbfile);
 
             if (!(await client.TestConnectionAsync()))
-                throw new System.Data.SQLite.SQLiteException("Connection test was not successful.");
+                throw new Microsoft.Data.Sqlite.SqliteException("Connection test was not successful.", -1);
 
             foreach (var table in Tables)
                 if (!(await client.TableExistsAsync(table.Key)))

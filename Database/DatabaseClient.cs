@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using System.IO;
-using System.Data.SQLite;
+using Microsoft.Data.Sqlite;
 using System.Threading.Tasks;
 using System.Linq;
 
@@ -10,25 +10,24 @@ namespace SmolyShortener.Database
 {
     public class DatabaseClient : IDisposable
     {
-        private SQLiteConnection _connection;
+        private SqliteConnection _connection;
 
         public DatabaseClient(string file)
         {
-            if (!File.Exists(file))
-                SQLiteConnection.CreateFile(file);
+            // if (!File.Exists(file))
+            //     File.Create(file).Dispose();
 
-            string connection = new SQLiteConnectionStringBuilder
+            string connection = new SqliteConnectionStringBuilder
             {
                 DataSource = file,
-                FailIfMissing = true
             }.ToString();
-            _connection = new SQLiteConnection(connection);
+            _connection = new SqliteConnection(connection);
             _connection.Open();
         }
 
         public async Task CreateTableAsync(string table, params DbColumn[] columns)
         {
-            var command = new SQLiteCommand(
+            var command = new SqliteCommand(
                 $"create table {table}({string.Join(',', columns)})",
                 _connection);
 
@@ -37,7 +36,7 @@ namespace SmolyShortener.Database
 
         public async Task<bool> TableExistsAsync(string table)
         {
-            var command = new SQLiteCommand($"SELECT name FROM sqlite_master WHERE type='table' AND name='{table}'", _connection);
+            var command = new SqliteCommand($"SELECT name FROM sqlite_master WHERE type='table' AND name='{table}'", _connection);
 
             return await command.ExecuteScalarAsync() != null;
         }
@@ -50,7 +49,7 @@ namespace SmolyShortener.Database
             string columns = string.Join(',', insertInfo.Select(info => info.column));
             string values = string.Join(',', insertInfo.Select(info => info.value));
 
-            var command = new SQLiteCommand(
+            var command = new SqliteCommand(
                 $"insert into {table}({columns}) " +
                 $"values({values})",
                 _connection);
@@ -70,7 +69,7 @@ namespace SmolyShortener.Database
                 ? $"where {string.Join(" and ", conditions)} "
                 : "";
 
-            var command = new SQLiteCommand(
+            var command = new SqliteCommand(
                 $"select {(unique ? "distinct " : "")}{colsString} from {table} " +
                 condsString +
                 $"limit {maxRows}",
@@ -93,7 +92,7 @@ namespace SmolyShortener.Database
         /// </returns>
         public async Task<bool> TestConnectionAsync()
         {
-            var command = new SQLiteCommand("select SQLITE_VERSION()", _connection);
+            var command = new SqliteCommand("select SQLITE_VERSION()", _connection);
             try
             {
                 return await command.ExecuteScalarAsync() != null;
