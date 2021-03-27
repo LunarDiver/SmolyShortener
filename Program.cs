@@ -42,7 +42,7 @@ namespace SmolyShortener
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                    webBuilder.UseUrls("http://*:80");
+                    webBuilder.UseUrls("http://*:80", "https://*:443");
                 });
 
         private static void MainDispose(object sender, EventArgs e)
